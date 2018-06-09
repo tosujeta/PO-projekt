@@ -23,6 +23,40 @@ namespace po_proj
         public MainWindow()
         {
             InitializeComponent();
+
+            Central central = new Central();
+            central.Customers.Add(new Customer("Janek", "Bar"));
+            central.Customers.Add(new Customer("Radek", "Rok"));
+            central.Customers.Add(new Customer("Bartek", "Jar"));
+
+
+            FillTreeViewWith(costumersTreeView, central.Customers);
+            costumersTreeView.MouseLeftButtonUp += treeItemDoubleClick;
+
+        }
+
+        private void treeItemDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            Customer item = (Customer) ((TreeView) sender).SelectedItem;
+            nameLabel.Content = item.GetName();
+            surnameLabel.Content = item.GetSurname();
+            Console.Out.WriteLine("Test");
+        }
+
+        private void FillTreeViewWith(TreeView costumersTreeView, List<Customer> customers)
+        {
+            TreeViewItem menu = new TreeViewItem() { Header = "Klienci" };
+            menu.IsExpanded = true;
+            customers.ForEach(c =>
+           {
+               menu.Items.Add(c);
+           });
+
+            costumersTreeView.Items.Add(menu);
+        }
+
+        public void MyButton_click(object sender, RoutedEventArgs e)
+        {
         }
     }
 }

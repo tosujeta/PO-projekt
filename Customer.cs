@@ -13,7 +13,7 @@ namespace po_proj
 
 
 
-        Customer(String name, String surname)
+        public Customer(String name, String surname)
         {
             this.name = name;
             this.surname = surname;
@@ -46,6 +46,11 @@ namespace po_proj
         public String GetSurname()
         {
             return surname;
+        }
+
+        public override string ToString()
+        {
+            return name + " " + surname;
         }
     }
 }

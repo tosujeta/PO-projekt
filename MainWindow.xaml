@@ -6,5 +6,16 @@
         xmlns:local="clr-namespace:po_proj"
         mc:Ignorable="d"
         Title="Samoloty" Height="450" Width="800">
-    <Grid/>
+    <Grid>
+        <TreeView Name="costumersTreeView"  HorizontalAlignment="Left" Height="247" Margin="10,10,0,0" VerticalAlignment="Top" Width="184"/>
+        <GroupBox Name ="Klient" Header="" HorizontalAlignment="Left" Height="147" Margin="10,262,0,0" VerticalAlignment="Top" Width="772">
+            <Grid HorizontalAlignment="Left" Height="128" VerticalAlignment="Top" Width="772" RenderTransformOrigin="1.02,0.09" Margin="0,0,0,0">
+                <Label Content="Imię:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <Label Content="Nazwisko:" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
+                <Label Name="nameLabel" Content="" HorizontalAlignment="Left" Margin="73,10,0,0" VerticalAlignment="Top"/>
+                <Label Name="surnameLabel" Content="" HorizontalAlignment="Left" Margin="73,41,0,0" VerticalAlignment="Top"/>
+
+            </Grid>
+        </GroupBox>
+    </Grid>
 </Window>

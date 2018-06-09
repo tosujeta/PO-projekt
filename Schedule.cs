@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace po_proj
 {
-    class Centrala
+    class Schedule
     {
     }
 }

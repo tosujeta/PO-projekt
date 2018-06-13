@@ -35,6 +35,15 @@ namespace po_proj
         {
             return routID;
         }
-       
+      
+        public bool IsSingle()
+        {
+            return isSingle;
+        }
+
+        public virtual int GetNumberOfTicket()
+        {
+            return 1;
+        }
     }
 }

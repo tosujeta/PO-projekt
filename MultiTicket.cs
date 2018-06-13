@@ -8,12 +8,17 @@ namespace po_proj
 {
     class MultiTicket : Ticket
     {
-        private int numberOfSeats;
+        public int NumberOfSeats { get; }
 
-        MultiTicket(int routID, int flightID, int price, int numberOfSeats) : base(routID, flightID, price)
+        public MultiTicket(int routID, int flightID, int price, int numberOfSeats) : base(routID, flightID, price)
         {
-            this.numberOfSeats = numberOfSeats;
+            this.NumberOfSeats = numberOfSeats;
             isSingle = false;
+        }
+
+        public override int GetNumberOfTicket()
+        {
+            return NumberOfSeats;
         }
     }
 }

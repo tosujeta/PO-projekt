@@ -8,25 +8,21 @@ namespace po_proj
 {
     class Plane
     {
-        private int Numberoftickets;
+        public int NumberOfTickets { get; }
         private int Range;
-        private int Speed;
+        private int Speed; //km na godzine
 
         public Plane(int Numberoftickets, int Range,  int Speed)
         {
-            this.Numberoftickets = Numberoftickets;
+            this.NumberOfTickets = Numberoftickets;
             this.Range = Range;
             this.Speed = Speed;
-        }
-        public int GetNumberoftickets()
-        {
-            return Numberoftickets;
         }
         public int GetRange()
         {
             return Range;
         }
-        public GetSpeed()
+        public int GetSpeed()
         {
             return Speed;
         }

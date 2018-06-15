@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace po_proj
 {
-    class Ticket
+    public class Ticket
     {
         private int routID;
         private int flightID;

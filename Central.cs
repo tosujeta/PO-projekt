@@ -9,17 +9,113 @@ namespace po_proj
 {
     class Central
     {
-        public List<Rout> Routs;
-        public List<Plane> Planes;
-        public List<Customer> Customers { get; }
-        private List<Airport> Airports;
+        public List<Rout> routs { get; }
+        public List<Plane> planes { get; }
+        public List<Customer> customers { get; }
+        public List<Airport> airports { get; }
 
         public Central()
         {
-            Routs = new List<Rout>();
-            Planes = new List<Plane>();
-            Customers = new List<Customer>();
-            Airports = new List<Airport>();
+            routs = new List<Rout>();
+            planes = new List<Plane>();
+            customers = new List<Customer>();
+            airports = new List<Airport>();
+        }
+
+        public Rout GenerateRout(DateTime flightTime, Airport fromAirport, Airport toAirport, FlightFrequency flightFrequency)
+        {
+            float distance = fromAirport.GetDistance(toAirport);
+            Plane plane = FindPlane(distance);
+
+            if (plane == null) throw new ApplicationException("There is no plain that meet requirements");
+
+            Rout rout = new Rout(flightTime, fromAirport, toAirport, plane, flightFrequency);
+
+            AddAirport(fromAirport);
+            AddAirport(toAirport);
+            AddRout(rout);
+
+            return rout;
+        }
+
+        private Plane FindPlane(float distance)
+        {
+            Plane planeReturn = null;
+            planes.ForEach(p =>
+            {
+                if (p.IsFree && p.GetRange() >= distance)
+                {
+                    p = planeReturn;
+                    return;
+                }
+            });
+            return planeReturn;
+        }
+
+        public void AddPlain(Plane plane)
+        {
+            if (planes.Contains(plane)) throw new ApplicationException("Plane already exist");
+            planes.Add(plane);
+        }
+
+        public void AddCustomer(Customer customer)
+        {
+            if (customers.Contains(customer)) throw new ApplicationException("Customer already exist");
+            customers.Add(customer);
+        }
+
+        public void AddRout(Rout route)
+        {
+            if(routs.Contains(route)) throw new ApplicationException("Rout already exist");
+            routs.Add(route);
+        }
+
+        public void AddAirport(Airport airport)
+        {
+            if (airports.Contains(airport)) throw new ApplicationException("Aiport already exist");
+            airports.Add(airport);
+        }
+
+        public void RemovePlain(Plane plane)
+        {
+            planes.Remove(plane);
+            //TODO: Sprawdz czy samolot jest juz gdzies przypisany
+        }
+        
+        public void RemoveCustomer(Customer customer)
+        {
+            customers.Remove(customer);
+            //TODO: Sprawdz czy on jest gdzies przypisany
+        }
+
+        public void RemoveRout(Rout rout)
+        {
+            routs.Remove(rout);
+            //TODO: Czy przypisany
+        }
+
+        public void RemoveAiport(Airport airport)
+        {
+            airports.Remove(airport);
+            //TODO: czy przypisany
+        }
+
+        public List<Rout> GetRouts()
+        {
+            return routs;
+        }
+
+        public List<Customer> GetCustomers()
+        {
+            return customers;
+        }
+        public List<Plane> GetPlane()
+        {
+            return planes;
+        }
+        public List<Airport> GetAirport()
+        {
+            return airports;
         }
 
     }

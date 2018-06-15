@@ -16,21 +16,20 @@ namespace po_proj
         private DateTime firstDeparturTime;
         private List<Schedule> schedules = new List<Schedule>();
 
-        public Rout(DateTime firstDeparturTime, Airport fromAirport, Airport toAirport, Plane plane, int routID)
+        public Rout(DateTime firstDeparturTime, Airport fromAirport, Airport toAirport, Plane plane, FlightFrequency flightFrequency)
         {
             this.firstDeparturTime = firstDeparturTime;
             this.fromAirport = fromAirport;
             this.toAirport = toAirport;
             this.plane = plane;
-            this.routID = routID;
+            this.flightFrequency = flightFrequency;
 
             schedules.Add(new Schedule(firstDeparturTime, CalculateArriveDateTime(), 0));
         }
 
-        public float GetDistacne()
+        public float GetDistance()
         {
-            return (float)Math.Sqrt(Math.Pow(fromAirport.GetX() - toAirport.GetX(), 2)
-                + Math.Pow(fromAirport.GetY() - toAirport.GetY(), 2));
+            return fromAirport.GetDistance(toAirport);
         }
 
         public int GetRoutID()
@@ -94,7 +93,11 @@ namespace po_proj
             Schedule returningValue = null;
             schedules.ForEach(schedule =>
            {
-               if (schedule.GetDepartureTime() == date) returningValue = schedule;
+               if (schedule.GetDepartureTime() == date)
+               {
+                   returningValue = schedule;
+                   return;
+               }
            });
 
             return returningValue;
@@ -105,18 +108,24 @@ namespace po_proj
             if (!WillFlight(date)) return; //Throw error
 
             Schedule schedule = FindSchedule(date);
-            DateTime arriveTime = date.AddTicks((long)(TimeSpan.TicksPerHour * plane.GetSpeed() / GetDistacne()));
+            DateTime arriveTime = date.AddTicks((long)(TimeSpan.TicksPerHour * plane.GetSpeed() / GetDistance()));
+
+            Console.WriteLine("Przed: " + schedule.NumberOfTicketsBought);
 
             if (schedule == null)
             {
                 schedule = new Schedule(date, arriveTime, 0);
+                schedules.Add(schedule);
             }
-            else if (schedule.NumberOfTicketsBought + schedule.NumberOfTicketsBought < plane.NumberOfTickets)
+            else if (schedule.NumberOfTicketsBought + customer.GetTicket().GetNumberOfTicket() > plane.NumberOfTickets)
             {
-                throw new System.ApplicationException("Seats limit reached");
+                throw new System.ApplicationException("Seats limit reached. Before=" + schedule.NumberOfTicketsBought + ", After=" 
+                    + (int) (schedule.NumberOfTicketsBought + customer.GetTicket().GetNumberOfTicket()) + ", Added=" + customer.GetTicket().GetNumberOfTicket());
             }
 
-            schedules.Add(new Schedule(date, arriveTime, 0));
+            Console.WriteLine("Po dodaniu " + customer.GetTicket().GetNumberOfTicket()  +"  To: " + schedule.NumberOfTicketsBought);
+
+            schedule.AddPassenger(customer);
         }
 
         public void AddPassenger(Customer customer)
@@ -126,7 +135,7 @@ namespace po_proj
 
         public DateTime CalculateArriveDateTime()
         {
-            return firstDeparturTime.AddTicks((long)(TimeSpan.TicksPerHour * plane.GetSpeed() / GetDistacne()));
+            return firstDeparturTime.AddTicks((long)(TimeSpan.TicksPerHour * ((float)plane.GetSpeed() / GetDistance())));
         }
     }
 }

@@ -21,7 +21,7 @@ namespace po_proj
         private DateTime Arrivaltime;
         private int flightID;
         public int NumberOfTicketsBought { get; private set; }
-        private List<Customer> passengers;
+        private List<Customer> passengers = new List<Customer>();
 
         public Schedule(DateTime Departuretime, DateTime Arrivaltime, int flightID)
         {

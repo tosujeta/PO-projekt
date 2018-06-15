@@ -6,27 +6,28 @@ using System.Threading.Tasks;
 
 namespace po_proj
 {
-    class Customer
+    public class Customer
     {
-        private Ticket ticket;
-        private String name, surname;
+        public Ticket Ticket { get; set; }
+        public String Name {get; set; }
+        public String Surname {get;set; }
 
 
 
         public Customer(String name, String surname)
         {
-            this.name = name;
-            this.surname = surname;
+            this.Name = name;
+            this.Surname = surname;
         }
 
         public void SetTicket(Ticket ticket)
         {
-            this.ticket = ticket;
+            this.Ticket = ticket;
         }
 
         public Ticket GetTicket()
         {
-            return ticket;
+            return Ticket;
         }
 
         /**
@@ -40,17 +41,17 @@ namespace po_proj
 
         public String GetName()
         {
-            return name;
+            return Name;
         }
 
         public String GetSurname()
         {
-            return surname;
+            return Surname;
         }
 
         public override string ToString()
         {
-            return name + " " + surname;
+            return Name + " " + Surname;
         }
     }
 }

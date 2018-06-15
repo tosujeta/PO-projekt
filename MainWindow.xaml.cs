@@ -20,9 +20,13 @@ namespace po_proj
     /// </summary>
     public partial class MainWindow : Window
     {
+        Central central = new Central();
+
         public MainWindow()
         {
             InitializeComponent();
+
+            Consola();
 
             Rout rout = new Rout(
                 new DateTime(2016, 1, 1, 12, 0, 0),
@@ -31,23 +35,19 @@ namespace po_proj
                 new Plane(20, 1000, 10),
                 0);
             DateTime date = new DateTime(2016, 1, 1, 12, 0, 1);
-            Console.WriteLine("Distance: " +rout.GetDistacne());
-            Console.WriteLine("IS one rout: " + rout.IsOneRout());
-            Console.WriteLine("WillFlight(false): " + rout.WillFlight(date));
             date = new DateTime(2016, 1, 1, 12, 0, 0);
-            Console.WriteLine("WillFlight(false): " + rout.WillFlight(date));
             Customer customer = new Customer("a", "b");
             customer.SetTicket(new Ticket(0, 0, 0));
             Customer customer2 = new Customer("b", "c");
-            customer.SetTicket(new MultiTicket(0, 0, 0, 500));
+            customer2.SetTicket(new MultiTicket(0, 0, 0, 500));
 
             try
             {//TODO poprawic bo nie mozna dodac pasazera
                 rout.AddPassenger(customer);
                 rout.AddPassenger(customer2);
-            }catch
+            }catch(System.ApplicationException e)
             {
-                Console.WriteLine("Wyjatek");
+                Console.WriteLine(e.Message);
             }
           
 
@@ -60,39 +60,68 @@ namespace po_proj
             Console.WriteLine(time2.Ticks + " : " + time.Ticks);
 
 
+            FillTreeViewWith(customersTreeView, central.customers);
+            FillTreeViewWith(planeTreeView, central.planes);
+            FillTreeViewWith(routsTreeView, central.routs);
+            FillTreeViewWith(airportTreeView, central.airports);
+            customersTreeView.MouseLeftButtonUp += treeItemDoubleClick;
+
+
+            addCustomerButton.Click += CustomerButton_click;
+            nameLabel.LostKeyboardFocus += (e, s) =>
+            {
+                String t = GetSelectedCustomer().Name;
+                SetText(ref t, GetTextBoxText(e));
+                GetSelectedCustomer().Name = t;
+            };
+        }
+
+        private void Consola()
+        {
             Central central = new Central();
-            central.Customers.Add(new Customer("Janek", "Bar"));
-            central.Customers.Add(new Customer("Radek", "Rok"));
-            central.Customers.Add(new Customer("Bartek", "Jar"));
 
+        }
 
-            FillTreeViewWith(costumersTreeView, central.Customers);
-            costumersTreeView.MouseLeftButtonUp += treeItemDoubleClick;
+        private void SetText(ref String name, String text)
+        {
+            if (text != null) 
+                name = text;
+        }
 
+        private Customer GetSelectedCustomer()
+        {
+            return (Customer) customersTreeView.SelectedItem;
+        }
+
+        private String GetTextBoxText(Object sender)
+        {
+            TextBox box = (TextBox)sender;
+            if (box.Text.Length == 0) return null;
+            return box.Text;
         }
 
         private void treeItemDoubleClick(object sender, MouseButtonEventArgs e)
         {
             Customer item = (Customer) ((TreeView) sender).SelectedItem;
-            nameLabel.Content = item.GetName();
-            surnameLabel.Content = item.GetSurname();
-            Console.Out.WriteLine("Test");
+            if (item == null) return;
+            nameLabel.Text = item.GetName();
+            surnameLabel.Text = item.GetSurname();
         }
 
-        private void FillTreeViewWith(TreeView costumersTreeView, List<Customer> customers)
+        private void FillTreeViewWith(TreeView treeView, IEnumerable<Object> list) 
         {
-            TreeViewItem menu = new TreeViewItem() { Header = "Klienci" };
-            menu.IsExpanded = true;
-            customers.ForEach(c =>
-           {
-               menu.Items.Add(c);
-           });
+            foreach(Object o in list)
+            {
+                treeView.Items.Add(o);
 
-            costumersTreeView.Items.Add(menu);
+            }
         }
 
-        public void MyButton_click(object sender, RoutedEventArgs e)
+        public void CustomerButton_click(object sender, RoutedEventArgs e)
         {
+            Customer customer = new Customer("Name", "Surname");
+            central.AddCustomer(customer);
+            customersTreeView.Items.Add(customer);
         }
     }
 }

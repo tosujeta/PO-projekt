@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,6 +29,17 @@ namespace po_proj
 
             Consola();
 
+            central.AddCustomer(new Customer("Name", "Surname"));
+
+            try
+            {
+                if (File.Exists("file")) LoeadFromFile(ref central, "file");
+            }
+            catch
+            {
+                Console.WriteLine("Some errror");
+            }
+
             Rout rout = new Rout(
                 new DateTime(2016, 1, 1, 12, 0, 0),
                 new Airport(0, 0, "Januszowo"),
@@ -45,11 +57,12 @@ namespace po_proj
             {//TODO poprawic bo nie mozna dodac pasazera
                 rout.AddPassenger(customer);
                 rout.AddPassenger(customer2);
-            }catch(System.ApplicationException e)
+            }
+            catch (System.ApplicationException e)
             {
                 Console.WriteLine(e.Message);
             }
-          
+
 
             DateTime time = new DateTime(2008, 12, 24, 12, 34, 12);
             DateTime time2 = new DateTime(2008, 12, 23, 12, 34, 12);
@@ -60,20 +73,63 @@ namespace po_proj
             Console.WriteLine(time2.Ticks + " : " + time.Ticks);
 
 
-            FillTreeViewWith(customersTreeView, central.customers);
-            FillTreeViewWith(planeTreeView, central.planes);
-            FillTreeViewWith(routsTreeView, central.routs);
-            FillTreeViewWith(airportTreeView, central.airports);
-            customersTreeView.MouseLeftButtonUp += treeItemDoubleClick;
+            customersTreeView.ItemsSource = central.customers;
+            planeTreeView.ItemsSource = central.planes;
+            airportTreeView.ItemsSource = central.airports;
+            routsTreeView.ItemsSource = central.routs;
+
+            customersTreeView.MouseLeftButtonUp += TreeItemDoubleClick;
 
 
             addCustomerButton.Click += CustomerButton_click;
-            nameLabel.LostKeyboardFocus += (e, s) =>
+            customerRatioButton.Checked += CustomButtomChecked;
+            customerRatioButton.Unchecked += CutomButtonUncheck;
+        }
+
+        public void SaveToFile(String f, Central central)
+        {
+            using (Stream stream = File.Open(f, FileMode.Create))
             {
-                String t = GetSelectedCustomer().Name;
-                SetText(ref t, GetTextBoxText(e));
-                GetSelectedCustomer().Name = t;
-            };
+                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                binaryFormatter.Serialize(stream, central);
+            }
+        }
+
+        public void LoeadFromFile(ref Central central, String f)
+        {
+            using (Stream stream = File.Open(f, FileMode.Open))
+            {
+                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                central = (Central)binaryFormatter.Deserialize(stream);
+            }
+        }
+
+        private void CutomButtonUncheck(object sender, RoutedEventArgs e)
+        {
+            nameLabel.IsEnabled = false;
+            surnameLabel.IsEnabled = false;
+            ticketPriceLabel.IsEnabled = false;
+            ticketNumberLabel.IsEnabled = false;
+
+            Customer customer = GetSelectedCustomer();
+            int price = customer.Ticket.Price, tickets;
+            if (nameLabel.Text.Length > 0) customer.Name = nameLabel.Text;
+            if (surnameLabel.Text.Length > 0) customer.Surname = surnameLabel.Text;
+            if (Int32.TryParse(ticketPriceLabel.Text, out price) && price > 0) customer.Ticket.Price = price;
+            if (Int32.TryParse(ticketNumberLabel.Text, out tickets) && tickets > 0)
+                if (!(customer.Ticket.IsSingle && tickets == 0))
+                    customer.Ticket = customer.Ticket.Change(price, tickets);
+            //TODO Powinno w locie tez zmienic rozna rzeczy
+
+            customersTreeView.Items.Refresh();
+        }
+
+        private void CustomButtomChecked(object sender, RoutedEventArgs e)
+        {
+            nameLabel.IsEnabled = true;
+            surnameLabel.IsEnabled = true;
+            ticketPriceLabel.IsEnabled = true;
+            ticketNumberLabel.IsEnabled = true;
         }
 
         private void Consola()
@@ -84,13 +140,13 @@ namespace po_proj
 
         private void SetText(ref String name, String text)
         {
-            if (text != null) 
+            if (text != null)
                 name = text;
         }
 
         private Customer GetSelectedCustomer()
         {
-            return (Customer) customersTreeView.SelectedItem;
+            return (Customer)customersTreeView.SelectedItem;
         }
 
         private String GetTextBoxText(Object sender)
@@ -100,28 +156,28 @@ namespace po_proj
             return box.Text;
         }
 
-        private void treeItemDoubleClick(object sender, MouseButtonEventArgs e)
+        private void TreeItemDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            Customer item = (Customer) ((TreeView) sender).SelectedItem;
+            Customer item = (Customer)((TreeView)sender).SelectedItem;
             if (item == null) return;
             nameLabel.Text = item.GetName();
             surnameLabel.Text = item.GetSurname();
-        }
-
-        private void FillTreeViewWith(TreeView treeView, IEnumerable<Object> list) 
-        {
-            foreach(Object o in list)
-            {
-                treeView.Items.Add(o);
-
-            }
+            ticketPriceLabel.Text = item.Ticket.Price.ToString();
+            ticketNumberLabel.Text =
+                item.Ticket.IsSingle ? "1" : ((MultiTicket)item.Ticket).GetNumberOfTicket().ToString();
+            
         }
 
         public void CustomerButton_click(object sender, RoutedEventArgs e)
         {
             Customer customer = new Customer("Name", "Surname");
             central.AddCustomer(customer);
-            customersTreeView.Items.Add(customer);
+            customersTreeView.Items.Refresh();
+        }
+
+        private void ClosingWindowEvent(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            SaveToFile("file", central);
         }
     }
 }

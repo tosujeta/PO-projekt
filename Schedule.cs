@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 namespace po_proj
 {
 
-    enum FlightFrequency : long
+    [Serializable]
+    public enum FlightFrequency : long
     {
         EVERY_WEEK = TimeSpan.TicksPerDay*7,
         EVERY_DAY = TimeSpan.TicksPerDay,
@@ -15,7 +16,9 @@ namespace po_proj
         EVERY_TREE_DAYS = TimeSpan.TicksPerDay * 3,
         EVERY_12_HOURS = TimeSpan.TicksPerHour*12
     }
-    class Schedule
+
+    [Serializable]
+    public class Schedule
     {
         private DateTime Departuretime;
         private DateTime Arrivaltime;

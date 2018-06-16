@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace po_proj
 {
-    class Central
+    [Serializable]
+    public class Central
     {
         public List<Rout> routs { get; }
         public List<Plane> planes { get; }
-        public List<Customer> customers { get; }
+        public List<Customer> customers { get; private set; }
         public List<Airport> airports { get; }
 
         public Central()
@@ -21,7 +23,6 @@ namespace po_proj
             customers = new List<Customer>();
             airports = new List<Airport>();
         }
-
         public Rout GenerateRout(DateTime flightTime, Airport fromAirport, Airport toAirport, FlightFrequency flightFrequency)
         {
             float distance = fromAirport.GetDistance(toAirport);
@@ -99,24 +100,5 @@ namespace po_proj
             airports.Remove(airport);
             //TODO: czy przypisany
         }
-
-        public List<Rout> GetRouts()
-        {
-            return routs;
-        }
-
-        public List<Customer> GetCustomers()
-        {
-            return customers;
-        }
-        public List<Plane> GetPlane()
-        {
-            return planes;
-        }
-        public List<Airport> GetAirport()
-        {
-            return airports;
-        }
-
     }
 }

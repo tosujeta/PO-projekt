@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 
 namespace po_proj
 {
-    class MultiTicket : Ticket
+    [Serializable]
+    public class MultiTicket : Ticket
     {
         public int NumberOfSeats { get; }
 
         public MultiTicket(int routID, int flightID, int price, int numberOfSeats) : base(routID, flightID, price)
         {
             this.NumberOfSeats = numberOfSeats;
-            isSingle = false;
+            IsSingle = false;
         }
 
         public override int GetNumberOfTicket()

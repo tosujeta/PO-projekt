@@ -6,24 +6,25 @@ using System.Threading.Tasks;
 
 namespace po_proj
 {
+    [Serializable]
     public class Ticket
     {
         private int routID;
         private int flightID;
-        private int price;
+        public int Price { get; set; }
 
-        protected bool isSingle = true;
+        public bool IsSingle { get; set; } = true;
 
         public Ticket(int routID, int flightID, int price)
         {
             this.routID = routID;
             this.flightID = flightID;
-            this.price = price;
+            this.Price = price;
         }
 
         public int GetPrice()
         {
-            return price;
+            return Price;
         }
 
         public int GetFlightID()
@@ -35,15 +36,16 @@ namespace po_proj
         {
             return routID;
         }
-      
-        public bool IsSingle()
-        {
-            return isSingle;
-        }
 
         public virtual int GetNumberOfTicket()
         {
             return 1;
+        }
+
+        public Ticket Change(int priceN, int numberOfSeatsN)
+        {
+            if (numberOfSeatsN == 0) return new Ticket(routID, flightID, priceN);
+            else return new MultiTicket(routID, flightID, priceN, numberOfSeatsN);
         }
     }
 }

@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace po_proj
 {
-    class Plane
+    [Serializable]
+    public class Plane
     {
         public int NumberOfTickets { get; }
         private int Range;

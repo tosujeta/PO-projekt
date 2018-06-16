@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace po_proj
 {
-    class Airport
+    [Serializable]
+    public class Airport
     {
         private string City;
         private int X, Y;
@@ -28,6 +29,12 @@ namespace po_proj
         public string GetCity()
         {
             return City;
+        }
+
+        public float GetDistance(Airport airport)
+        {
+            return (float)Math.Sqrt(Math.Pow(this.GetX() - airport.GetX(), 2)
+            + Math.Pow(this.GetY() - airport.GetY(), 2));
         }
     }
 }

@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace po_proj
 {
-    class Rout
+    [Serializable]
+    public class Rout
     {
         private Airport fromAirport, toAirport;
         private Plane plane;

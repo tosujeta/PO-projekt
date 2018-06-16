@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace po_proj
 {
+    [Serializable]
     public class Customer
     {
         public Ticket Ticket { get; set; }
@@ -16,6 +17,7 @@ namespace po_proj
 
         public Customer(String name, String surname)
         {
+            SetTicket(new Ticket(0,0,0));
             this.Name = name;
             this.Surname = surname;
         }
@@ -28,15 +30,6 @@ namespace po_proj
         public Ticket GetTicket()
         {
             return Ticket;
-        }
-
-        /**
-         * TODO: TO chyba nie bedzie potrzebne
-         * mozna uyzc SetTicket.
-         * */
-        public void ChangeBilet()
-        {
-
         }
 
         public String GetName()

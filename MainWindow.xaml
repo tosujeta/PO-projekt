@@ -5,15 +5,60 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:po_proj"
         mc:Ignorable="d"
+        Closing="ClosingWindowEvent"
         Title="Samoloty" Height="450" Width="800">
     <Grid>
-        <GroupBox Name ="Klient" Header="" HorizontalAlignment="Left" Height="147" Margin="10,262,0,0" VerticalAlignment="Top" Width="772">
+        <GroupBox Name ="customerGroup" Visibility="Visible" Header="" HorizontalAlignment="Left" Height="147" Margin="10,262,0,0" VerticalAlignment="Top" Width="772">
             <Grid HorizontalAlignment="Left" Height="128" VerticalAlignment="Top" Width="772" RenderTransformOrigin="1.02,0.09" Margin="0,0,0,0">
                 <Label Content="Imię:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                 <Label Content="Nazwisko:" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
-                <TextBox Name="nameLabel" HorizontalAlignment="Left" Margin="73,10,0,0" VerticalAlignment="Top" Width="100"/>
-                <TextBox Name="surnameLabel"  HorizontalAlignment="Left" Margin="73,41,0,0" VerticalAlignment="Top" Width="100"/>
+                <TextBox Name="nameLabel" IsEnabled="false" HorizontalAlignment="Left" Margin="73,10,0,0" VerticalAlignment="Top" Width="100"/>
+                <TextBox Name="surnameLabel" IsEnabled="false"  HorizontalAlignment="Left" Margin="73,41,0,0" VerticalAlignment="Top" Width="100"/>
+                <Label Content="Cena biletu:" HorizontalAlignment="Left" Margin="221,10,0,0" VerticalAlignment="Top"/>
+                <Label Content="Liczba biletów:" HorizontalAlignment="Left" Margin="221,41,0,0" VerticalAlignment="Top"/>
+                <TextBox Name="ticketPriceLabel" IsEnabled="false" HorizontalAlignment="Left" Height="23" Margin="327,10,0,0" Text="" VerticalAlignment="Top" Width="120"/>
+                <TextBox Name="ticketNumberLabel" IsEnabled="false" HorizontalAlignment="Left" Height="23" Margin="327,41,0,0" Text="" VerticalAlignment="Top" Width="120"/>
+                <CheckBox Name="customerRatioButton" Content="Edytuj" HorizontalAlignment="Left" Margin="710,103,0,0" VerticalAlignment="Top"/>
+            </Grid>
+        </GroupBox>
 
+        <GroupBox Name ="airportGroup" Visibility="Hidden" Header="" HorizontalAlignment="Left" Height="147" Margin="10,262,0,0" VerticalAlignment="Top" Width="772">
+            <Grid HorizontalAlignment="Left" Height="128" VerticalAlignment="Top" Width="772" RenderTransformOrigin="1.02,0.09" Margin="0,0,0,0">
+                <Label Content="City:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <Label Content="X:" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top"/>
+                <Label Content="Y:" HorizontalAlignment="Left" Margin="138,36,0,0" VerticalAlignment="Top"/>
+                <TextBox Name="cityLabel" HorizontalAlignment="Left" Margin="48,15,0,0" VerticalAlignment="Top" Width="77"/>
+                <TextBox Name="xLabel" HorizontalAlignment="Left" Margin="48,36,0,0" VerticalAlignment="Top" Width="77"/>
+                <TextBox Name="yLabel" HorizontalAlignment="Left" Margin="162,41,0,0" VerticalAlignment="Top" Width="77"/>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Name ="planeGroup" Visibility="Hidden" Header="" HorizontalAlignment="Left" Height="147" Margin="10,262,0,0" VerticalAlignment="Top" Width="772">
+            <Grid HorizontalAlignment="Left" Height="128" VerticalAlignment="Top" Width="772" RenderTransformOrigin="1.02,0.09" Margin="0,0,0,0">
+                <Label Content="Number of seats:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <Label Content="Range:" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
+                <Label Content="Speed:" HorizontalAlignment="Left" Margin="10,67,0,0" VerticalAlignment="Top"/>
+                <Label Content="Is free:" HorizontalAlignment="Left" Margin="10,98,0,0" VerticalAlignment="Top"/>
+                <Label Content="km" HorizontalAlignment="Left" Margin="200,41,0,0" VerticalAlignment="Top"/>
+                <Label Content="km/h" HorizontalAlignment="Left" Margin="200,72,0,0" VerticalAlignment="Top"/>
+                <TextBox HorizontalAlignment="Left" Height="23" Margin="118,10,0,0" VerticalAlignment="Top" Width="80"/>
+                <TextBox HorizontalAlignment="Left" Height="23" Margin="118,44,0,0" VerticalAlignment="Top" Width="80"/>
+                <TextBox HorizontalAlignment="Left" Height="23" Margin="118,72,0,0" VerticalAlignment="Top" Width="80"/>
+                <TextBox HorizontalAlignment="Left" Height="23" Margin="118,100,0,0" VerticalAlignment="Top" Width="80"/>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Name ="routGroup" Visibility="Hidden" Header="" HorizontalAlignment="Left" Height="147" Margin="10,262,0,0" VerticalAlignment="Top" Width="772">
+            <Grid HorizontalAlignment="Left" Height="128" VerticalAlignment="Top" Width="772" RenderTransformOrigin="1.02,0.09" Margin="0,0,0,0">
+                <Label Content="Airport1" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <Label Content="Aiport2" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
+                <Label Content="Plane" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top"/>
+                <Label Content="Flight frequency" HorizontalAlignment="Left" Margin="11,98,0,0" VerticalAlignment="Top"/>
+                <ComboBox HorizontalAlignment="Left" Margin="111,99,0,0" VerticalAlignment="Top" Width="120"/>
+                <ComboBox HorizontalAlignment="Left" Margin="111,14,0,0" VerticalAlignment="Top" Width="120"/>
+                <ComboBox HorizontalAlignment="Left" Margin="111,45,0,0" VerticalAlignment="Top" Width="120"/>
+                <ComboBox HorizontalAlignment="Left" Margin="111,72,0,0" VerticalAlignment="Top" Width="120"/>
+                <TreeView HorizontalAlignment="Left" Height="111" Margin="247,10,0,0" VerticalAlignment="Top" Width="118"/>
             </Grid>
         </GroupBox>
         <Button Name="addCustomerButton" Content="Dodaj pasażera" HorizontalAlignment="Left" Margin="10,237,0,0" VerticalAlignment="Top" Width="184"/>

@@ -9,38 +9,36 @@ namespace po_proj
     [Serializable]
     public class Airport
     {
-        public string City { get; set; }
-        public int X { get; set; }
-        public int  Y {get; set;}
+        public string City { get; private set; } = "Nie ustalone";
+        public int X { get; private set; }
+        public int Y { get; private set; }
+        public bool IsSetUp { get; private set; }
 
-        public  Airport( int X,int Y,string City)
+        public Airport()
         {
+
+        }
+
+        public void SetUp(int x, int y, string City)
+        {
+            if (IsSetUp) return;
             this.City = City;
-            this.X = X;
-            this.Y = Y; 
-        }
-        public int GetX()
-        {
-            return X;
-        }
-        public int GetY()
-        {
-            return Y;
-        }
-        public string GetCity()
-        {
-            return City;
+            this.X = x;
+            this.Y = y;
+            IsSetUp = true;
         }
 
         public float GetDistance(Airport airport)
         {
-            return (float)Math.Sqrt(Math.Pow(this.GetX() - airport.GetX(), 2)
-            + Math.Pow(this.GetY() - airport.GetY(), 2));
+            return (float)Math.Sqrt(Math.Pow(this.X - airport.Y, 2)
+            + Math.Pow(this.X - airport.Y, 2));
         }
 
         public override string ToString()
         {
-            return City + " (" + X + " : " + Y + ")";
+            String str = City + " (" + X + " : " + Y + ")";
+            if (!IsSetUp) str += " (Nieuzupełniony)";
+            return str;
         }
     }
 }

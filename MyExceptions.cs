@@ -25,4 +25,14 @@ namespace po_proj
     {
         public FlightFrequencyException(String str) : base(str) { }
     }
+
+    public class PlaneInUseException : Exception
+    {
+        public PlaneInUseException(String str) : base(str) { }
+    }
+
+    public class AirportInUseException : Exception
+    {
+        public AirportInUseException(String str) : base(str) { }
+    }
 }

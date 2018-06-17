@@ -11,7 +11,7 @@ namespace po_proj
     {
         public int NumberOfSeats { get; }
 
-        public MultiTicket(int routID, int flightID, int price, int numberOfSeats) : base(routID, flightID, price)
+        public MultiTicket(int price, int numberOfSeats) : base( price)
         {
             this.NumberOfSeats = numberOfSeats;
             IsSingle = false;
@@ -19,7 +19,10 @@ namespace po_proj
 
         public override int GetNumberOfTicket()
         {
+            Console.WriteLine();
             return NumberOfSeats;
         }
+
+       
     }
 }

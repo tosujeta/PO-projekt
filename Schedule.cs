@@ -21,48 +21,36 @@ namespace po_proj
     [Serializable]
     public class Schedule
     {
-        private DateTime Departuretime;
-        private DateTime Arrivaltime;
-        private Rout flight;
+        public DateTime Departuretime { get; private set; }
+        public DateTime Arrivaltime { get; private set; }
+        public Rout Rout { get; private set; }
         public int NumberOfTicketsBought { get; private set; }
         private List<Customer> passengers = new List<Customer>();
 
-        public Schedule(DateTime Departuretime, DateTime Arrivaltime, Rout flightID)
+        public Schedule(DateTime Departuretime, DateTime Arrivaltime, Rout rout)
         {
             this.Departuretime = Departuretime;
             this.Arrivaltime = Arrivaltime;
-            this.flight = flightID;
-        }
-        public DateTime GetDepartureTime()
-        {
-            return Departuretime;
+            this.Rout = rout;
         }
 
         internal void UpdatePassenger(int newTicketsSize, int oldTicketSize)
         {
             NumberOfTicketsBought -= oldTicketSize;
-            if (NumberOfTicketsBought + newTicketsSize <= flight.GetPlain().NumberOfTickets)
+            if (NumberOfTicketsBought + newTicketsSize <= Rout.Plane.NumberOfTickets)
             {
                 NumberOfTicketsBought += newTicketsSize;
             }
             else
             {
                 NumberOfTicketsBought += oldTicketSize;
-                throw new MaxPassengersReached("Osiągnięto limit miejsc. Przed dodaniem =" + NumberOfTicketsBought + ", Po dodaniu="
-               + (int)(NumberOfTicketsBought + newTicketsSize) + ", Do dodania=" + newTicketsSize + "Max=" + flight.GetPlain().NumberOfTickets);
+                throw new MaxPassengersReached("Osiągnięto limit miejsc. Przed dodaniem=" + NumberOfTicketsBought + ", Po dodaniu="
+               + (int)(NumberOfTicketsBought + newTicketsSize) + ", Do dodania=" + newTicketsSize + ", Max=" + Rout.Plane.NumberOfTickets);
             }
 
             ;
         }
 
-        public DateTime GetArrivalTime()
-        {
-            return Arrivaltime;
-        }
-        public Rout GetFlightID()
-        {
-            return flight;
-        }
         public void SetTime(DateTime Departuretime, DateTime Arrivaltime)
         {
             this.Departuretime = Departuretime;
@@ -71,21 +59,27 @@ namespace po_proj
 
         public void AddPassenger(Customer customer)
         {
+            if (passengers.Contains(customer)) return;
+            UpdatePassenger(customer.Ticket.GetNumberOfTicket(), 0);
             passengers.Add(customer);
-            UpdatePassenger(customer.GetTicket().GetNumberOfTicket(), 0);
         }
 
         public void RemovePassenger(Customer customer)
         {
             if (passengers.Remove(customer))
             {
-                NumberOfTicketsBought -= customer.GetTicket().GetNumberOfTicket();
+                NumberOfTicketsBought -= customer.Ticket.GetNumberOfTicket();
             }
         }
 
         public override string ToString()
         {
             return Departuretime.ToShortDateString() + " - " + Departuretime.ToLongTimeString();
+        }
+
+        public string GetArrivalTimeAsString()
+        {
+            return Arrivaltime.ToShortDateString() + " - " + Arrivaltime.ToLongTimeString();
         }
 
         public List<Customer> GetPassengersList()

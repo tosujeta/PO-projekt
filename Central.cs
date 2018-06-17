@@ -11,94 +11,133 @@ namespace po_proj
     [Serializable]
     public class Central
     {
-        public List<Rout> routs { get; }
-        public List<Plane> planes { get; }
-        public List<Customer> customers { get; private set; }
-        public List<Airport> airports { get; }
+        public List<Rout> Routs { get; }
+        public List<Plane> Planes { get; }
+        public List<Customer> Customers { get; }
+        public List<Airport> Airports { get; }
 
         public Central()
         {
-            routs = new List<Rout>();
-            planes = new List<Plane>();
-            customers = new List<Customer>();
-            airports = new List<Airport>();
+            Routs = new List<Rout>();
+            Planes = new List<Plane>();
+            Customers = new List<Customer>();
+            Airports = new List<Airport>();
         }
-        public Rout GenerateRout(DateTime flightTime, Airport fromAirport, Airport toAirport, FlightFrequency flightFrequency)
+        public void GenerateRout(Rout rout, DateTime date, Airport fromAirport, Airport toAirport, int seats, FlightFrequency flightFrequency)
         {
             float distance = fromAirport.GetDistance(toAirport);
-            Plane plane = FindPlane(distance);
+            Plane plane = FindPlane(distance, seats);
 
-            if (plane == null) throw new ApplicationException("There is no plain that meet requirements");
+            if (plane == null) throw new Exception("Brak samolotu spełniającego kryteria :(");
 
-            Rout rout = new Rout(flightTime, fromAirport, toAirport, plane, flightFrequency);
-
-            AddAirport(fromAirport);
-            AddAirport(toAirport);
-            AddRout(rout);
-
-            return rout;
+            rout.SetUpFlight(date, fromAirport, toAirport, plane, flightFrequency);
         }
 
-        private Plane FindPlane(float distance)
+        private Plane FindPlane(float distance, int seats)
         {
             Plane planeReturn = null;
-            planes.ForEach(p =>
+            Planes.ForEach(p =>
             {
-                if (p.IsFree && p.GetRange() >= distance)
+                if (p.IsFree && p.Range >= distance && p.NumberOfTickets >= seats)
                 {
-                    p = planeReturn;
+                    planeReturn = p;
                     return;
                 }
             });
             return planeReturn;
         }
 
+        
         public void AddPlain(Plane plane)
         {
-            if (planes.Contains(plane)) throw new ApplicationException("Plane already exist");
-            planes.Add(plane);
+            if (Planes.Contains(plane)) throw new ApplicationException("Plane already exist");
+            Planes.Add(plane);
         }
 
         public void AddCustomer(Customer customer)
         {
-            if (customers.Contains(customer)) throw new ApplicationException("Customer already exist");
-            customers.Add(customer);
+            if (Customers.Contains(customer)) throw new ApplicationException("Customer already exist");
+            Customers.Add(customer);
         }
 
         public void AddRout(Rout route)
         {
-            if(routs.Contains(route)) throw new ApplicationException("Rout already exist");
-            routs.Add(route);
+            if (Routs.Contains(route)) throw new ApplicationException("Rout already exist");
+            Routs.Add(route);
         }
 
         public void AddAirport(Airport airport)
         {
-            if (airports.Contains(airport)) throw new ApplicationException("Aiport already exist");
-            airports.Add(airport);
-        }
-
-        public void RemovePlain(Plane plane)
-        {
-            planes.Remove(plane);
-            //TODO: Sprawdz czy samolot jest juz gdzies przypisany
+            if (Airports.Contains(airport)) throw new ApplicationException("Aiport already exist");
+            Airports.Add(airport);
         }
         
+        public void RemovePlain(Plane plane)
+        {
+            if (!plane.IsFree)
+            {
+                throw new PlaneInUseException("Samolot jest w użyciu. Zmien trasę która wykorzystuje ten samolot, albo usuń trasę");
+            }
+            Planes.Remove(plane);
+        }
+
         public void RemoveCustomer(Customer customer)
         {
-            customers.Remove(customer);
-            //TODO: Sprawdz czy on jest gdzies przypisany
+            if (customer.FlightSchedule != null)
+                customer.FlightSchedule.RemovePassenger(customer);
+            Customers.Remove(customer);
         }
 
         public void RemoveRout(Rout rout)
         {
-            routs.Remove(rout);
-            //TODO: Czy przypisany
+            //Gdy trasa jest stworzona i ustalona
+            if (rout.IsSetUp())
+            {
+                //Lista psażerów do usunięcia
+                List<Customer> cusToRemove = new List<Customer>();
+                rout.GetSchedules().ForEach(s =>
+                {
+                    s.GetPassengersList().ForEach(p =>
+                    {
+                        cusToRemove.Add(p);
+                        //p.SetFlightSchedule(null);
+                    });
+                });
+                //Usuń loty dla każdego pasażera
+                cusToRemove.ForEach(c => c.SetFlightSchedule(null));
+            }
+            Routs.Remove(rout);
+
+            //Ustaw status samolotu na wolny i sprawdź czy jest wykorzystywany w innych lotach,
+            //Jak tak to zmień jego status ponownie
+            rout.Plane.Unassign();
+            Routs.ForEach(r =>
+            {
+                if (r.Plane == rout.Plane)
+                {
+                    rout.Plane.Assign();
+                    return;
+                }
+            });
         }
 
         public void RemoveAiport(Airport airport)
         {
-            airports.Remove(airport);
-            //TODO: czy przypisany
+            if (airport.IsSetUp)
+            {
+                //Czy przypisany do lotu?
+                bool inUse = false;
+                Routs.ForEach(r =>
+                {
+                    if (r.FromAirport == airport || r.ToAirport == airport)
+                    {
+                        inUse = true;
+                        return;
+                    }
+                });
+                if (inUse) throw new AirportInUseException("Lotnisko jest w użyciu. Zmień trasę która wykorzystuje to lotnisko, albo unuń trasę");
+            }
+            Airports.Remove(airport);
         }
     }
 }

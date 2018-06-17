@@ -17,7 +17,7 @@ namespace po_proj
 
         public Customer(String name, String surname, Schedule flightSchedule)
         {
-            SetTicket(new Ticket(0, 0, 0));
+            SetTicket(new Ticket(0));
             this.Name = name;
             this.FlightSchedule = flightSchedule;
             this.Surname = surname;
@@ -25,35 +25,21 @@ namespace po_proj
 
         public void SetFlightSchedule(Schedule schedule)
         {
+            if (schedule != null) schedule.AddPassenger(this);
             if (FlightSchedule != null)
             {
                 FlightSchedule.RemovePassenger(this);
-                schedule.AddPassenger(this);
             }
             FlightSchedule = schedule;
         }
 
         public void SetTicket(Ticket ticket)
         {
-            if(FlightSchedule != null)
+            if (FlightSchedule != null)
             {
                 FlightSchedule.UpdatePassenger(ticket.GetNumberOfTicket(), Ticket.GetNumberOfTicket());
             }
             this.Ticket = ticket;
-        }
-        public Ticket GetTicket()
-        {
-            return Ticket;
-        }
-
-        public String GetName()
-        {
-            return Name;
-        }
-
-        public String GetSurname()
-        {
-            return Surname;
         }
 
         public override string ToString()
@@ -63,7 +49,7 @@ namespace po_proj
 
         public Rout GetFlight()
         {
-            if (FlightSchedule != null) return FlightSchedule.GetFlightID();
+            if (FlightSchedule != null) return FlightSchedule.Rout;
             return null;
         }
     }

@@ -10,26 +10,26 @@ namespace po_proj
     public class Plane
     {
 
-        public String Name { get; set; }
-        public int NumberOfTickets { get; set; }
-        public int Range { get; set; }
-        public int Speed { get; set; }
+        public String Name { get; set; } = "Bez nazwy";
+        public int NumberOfTickets { get; private set; }
+        public int Range { get; private set; }
+        public int Speed { get; private set; }
         public bool IsFree { get; private set; } = true;
+        public bool IsSetUp { get; private set; } = false;
 
-        public Plane(String name,int Numberoftickets, int Range, int Speed)
+        public Plane()
         {
+
+        }
+
+        public void SetUp(String name, int NumberOfTickets, int Range, int Speed)
+        {
+            if (IsSetUp) return;
             this.Name = name;
-            this.NumberOfTickets = Numberoftickets;
+            this.NumberOfTickets = NumberOfTickets;
             this.Range = Range;
             this.Speed = Speed;
-        }
-        public int GetRange()
-        {
-            return Range;
-        }
-        public int GetSpeed()
-        {
-            return Speed;
+            IsSetUp = true;
         }
 
         public void Assign()
@@ -44,7 +44,9 @@ namespace po_proj
 
         public override string ToString()
         {
-            return Name + " (" + NumberOfTickets + ")";
+            String str = Name + " (" + NumberOfTickets + ")";
+            if (!IsSetUp) str += " (Nieuzupełniony)";
+            return str;
         }
     }
 }

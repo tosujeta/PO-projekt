@@ -9,8 +9,9 @@ namespace po_proj
     [Serializable]
     public class Airport
     {
-        private string City;
-        private int X, Y;
+        public string City { get; set; }
+        public int X { get; set; }
+        public int  Y {get; set;}
 
         public  Airport( int X,int Y,string City)
         {
@@ -35,6 +36,11 @@ namespace po_proj
         {
             return (float)Math.Sqrt(Math.Pow(this.GetX() - airport.GetX(), 2)
             + Math.Pow(this.GetY() - airport.GetY(), 2));
+        }
+
+        public override string ToString()
+        {
+            return City + " (" + X + " : " + Y + ")";
         }
     }
 }

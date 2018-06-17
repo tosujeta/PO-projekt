@@ -56,6 +56,7 @@
     </ApplicationDefinition>
     <Compile Include="Airport.cs" />
     <Compile Include="MultiTicket.cs" />
+    <Compile Include="MyExceptions.cs" />
     <Compile Include="Plane.cs" />
     <Compile Include="Rout.cs" />
     <Compile Include="Schedule.cs" />

@@ -9,13 +9,16 @@ namespace po_proj
     [Serializable]
     public class Plane
     {
-        public int NumberOfTickets { get; }
-        private int Range;
-        private int Speed; //km na godzine
+
+        public String Name { get; set; }
+        public int NumberOfTickets { get; set; }
+        public int Range { get; set; }
+        public int Speed { get; set; }
         public bool IsFree { get; private set; } = true;
 
-        public Plane(int Numberoftickets, int Range, int Speed)
+        public Plane(String name,int Numberoftickets, int Range, int Speed)
         {
+            this.Name = name;
             this.NumberOfTickets = Numberoftickets;
             this.Range = Range;
             this.Speed = Speed;
@@ -37,6 +40,11 @@ namespace po_proj
         public void Unassign()
         {
             IsFree = true;
+        }
+
+        public override string ToString()
+        {
+            return Name + " (" + NumberOfTickets + ")";
         }
     }
 }

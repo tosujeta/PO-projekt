@@ -9,24 +9,38 @@ namespace po_proj
     [Serializable]
     public class Customer
     {
-        public Ticket Ticket { get; set; }
-        public String Name {get; set; }
-        public String Surname {get;set; }
+        public Ticket Ticket { get; private set; }
+        public String Name { get; set; }
+        public String Surname { get; set; }
+        public Schedule FlightSchedule { get; private set; }
 
 
-
-        public Customer(String name, String surname)
+        public Customer(String name, String surname, Schedule flightSchedule)
         {
-            SetTicket(new Ticket(0,0,0));
+            SetTicket(new Ticket(0, 0, 0));
             this.Name = name;
+            this.FlightSchedule = flightSchedule;
             this.Surname = surname;
+        }
+
+        public void SetFlightSchedule(Schedule schedule)
+        {
+            if (FlightSchedule != null)
+            {
+                FlightSchedule.RemovePassenger(this);
+                schedule.AddPassenger(this);
+            }
+            FlightSchedule = schedule;
         }
 
         public void SetTicket(Ticket ticket)
         {
+            if(FlightSchedule != null)
+            {
+                FlightSchedule.UpdatePassenger(ticket.GetNumberOfTicket(), Ticket.GetNumberOfTicket());
+            }
             this.Ticket = ticket;
         }
-
         public Ticket GetTicket()
         {
             return Ticket;
@@ -45,6 +59,12 @@ namespace po_proj
         public override string ToString()
         {
             return Name + " " + Surname;
+        }
+
+        public Rout GetFlight()
+        {
+            if (FlightSchedule != null) return FlightSchedule.GetFlightID();
+            return null;
         }
     }
 }

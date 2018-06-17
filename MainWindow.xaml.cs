@@ -29,6 +29,14 @@ namespace po_proj
         {
             InitializeComponent();
 
+            float expected = 5f;
+
+            Airport airport = new Airport();
+            airport.SetUp(2, 5, "1");
+            Airport airport2 = new Airport();
+            airport2.SetUp(5, 9, "2");
+            float actual = airport.GetDistance(airport2);
+
 
 
             //DO USUNIECIA
@@ -38,7 +46,7 @@ namespace po_proj
             airportGroup.Visibility = Visibility.Hidden;
 
 
-            central.AddCustomer(new Customer("Name", "Surname", null));
+            central.AddCustomer(new Customer("Name", "Surname"));
 
             try
             {
@@ -510,7 +518,7 @@ namespace po_proj
 
         public void AddCustomerButtonClick(object sender, RoutedEventArgs e)
         {
-            Customer customer = new Customer("Name", "Surname", null);
+            Customer customer = new Customer("Name", "Surname");
             central.AddCustomer(customer);
             RefreshTreeView();
         }

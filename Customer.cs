@@ -15,11 +15,10 @@ namespace po_proj
         public Schedule FlightSchedule { get; private set; }
 
 
-        public Customer(String name, String surname, Schedule flightSchedule)
+        public Customer(String name, String surname)
         {
             SetTicket(new Ticket(0));
             this.Name = name;
-            this.FlightSchedule = flightSchedule;
             this.Surname = surname;
         }
 

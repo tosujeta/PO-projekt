@@ -15,7 +15,7 @@ namespace po_proj
         public Plane Plane { get; private set; }
         public FlightFrequency FlightFrequency { get; private set; }
         public DateTime FirstDeparturTime { get; private set; }
-        private List<Schedule> schedules = new List<Schedule>();
+        public List<Schedule> schedules { get; } = new List<Schedule>();
 
         public Rout(DateTime date, FlightFrequency flightFrequency)
         {
@@ -118,8 +118,8 @@ namespace po_proj
         public Schedule PreviousSchedule(Schedule dateContext)
         {
             DateTime time = new DateTime(dateContext.Departuretime.Ticks - (long)FlightFrequency);
-            if (time < DateTime.MinValue || time > DateTime.MaxValue) throw new DateIncorrect("Data jest nieprawidłowa");
-            if (time < FirstDeparturTime) throw new DateIncorrect("Data wylotu wcześniejsza niż data pierwszego wylotu");
+            if (time < DateTime.MinValue || time > DateTime.MaxValue) throw new DateIncorrectException("Data jest nieprawidłowa");
+            if (time < FirstDeparturTime) throw new DateIncorrectException("Data wylotu wcześniejsza niż data pierwszego wylotu");
             Schedule schedule = FindSchedule(time);
             if (schedule == null) schedule = new Schedule(time, CalculateArriveDateTime(time), this);
             return schedule;
@@ -140,22 +140,6 @@ namespace po_proj
            });
 
             return returningValue;
-        }
-
-        public void AddPassenger(Customer customer, DateTime date)
-        {
-            if (!WillFlight(date)) return; //Throw error
-
-            Schedule schedule = FindSchedule(date);
-            DateTime arriveTime = date.AddTicks((long)(TimeSpan.TicksPerHour * Plane.Speed / GetDistance()));
-
-            if (schedule == null)
-            {
-                schedule = new Schedule(date, arriveTime, this);
-                schedules.Add(schedule);
-            }
-
-            AddPassanger(customer, schedule);
         }
 
         public void AddPassanger(Customer customer, Schedule schedule)

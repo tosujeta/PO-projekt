@@ -11,14 +11,14 @@ namespace po_proj
         public AirportDistanceException(String str) : base(str) { }
     }
 
-    public class MaxPassengersReached : Exception
+    public class MaxPassengersReachedException : Exception
     {
-        public MaxPassengersReached(String str) : base(str) { }
+        public MaxPassengersReachedException(String str) : base(str) { }
     }
 
-    public class DateIncorrect : Exception
+    public class DateIncorrectException : Exception
     {
-        public DateIncorrect(String str) : base(str) { }
+        public DateIncorrectException(String str) : base(str) { }
     }
 
     public class FlightFrequencyException : Exception

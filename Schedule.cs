@@ -34,7 +34,7 @@ namespace po_proj
             this.Rout = rout;
         }
 
-        internal void UpdatePassenger(int newTicketsSize, int oldTicketSize)
+        public void UpdatePassenger(int newTicketsSize, int oldTicketSize)
         {
             NumberOfTicketsBought -= oldTicketSize;
             if (NumberOfTicketsBought + newTicketsSize <= Rout.Plane.NumberOfTickets)
@@ -44,11 +44,9 @@ namespace po_proj
             else
             {
                 NumberOfTicketsBought += oldTicketSize;
-                throw new MaxPassengersReached("Osiągnięto limit miejsc. Przed dodaniem=" + NumberOfTicketsBought + ", Po dodaniu="
+                throw new MaxPassengersReachedException("Osiągnięto limit miejsc. Przed dodaniem=" + NumberOfTicketsBought + ", Po dodaniu="
                + (int)(NumberOfTicketsBought + newTicketsSize) + ", Do dodania=" + newTicketsSize + ", Max=" + Rout.Plane.NumberOfTickets);
             }
-
-            ;
         }
 
         public void SetTime(DateTime Departuretime, DateTime Arrivaltime)

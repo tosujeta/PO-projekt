@@ -30,8 +30,15 @@ namespace po_proj
 
         public float GetDistance(Airport airport)
         {
-            return (float)Math.Sqrt(Math.Pow(this.X - airport.Y, 2)
-            + Math.Pow(this.X - airport.Y, 2));
+            int a = this.X;
+            int b = this.Y;
+            int c = airport.X;
+            int d = airport.Y;
+            int e = a - c;
+            int f = c - d;
+            float x = (float) Math.Pow(airport.X - this.X, 2);
+            float y = (float) Math.Pow(airport.Y - this.Y, 2);
+            return (float)Math.Sqrt(x + y);
         }
 
         public override string ToString()

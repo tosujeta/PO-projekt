@@ -15,7 +15,8 @@ namespace po_proj
         public Plane Plane { get; private set; }
         public FlightFrequency FlightFrequency { get; private set; }
         public DateTime FirstDeparturTime { get; private set; }
-        public List<Schedule> schedules { get; } = new List<Schedule>();
+        public List<Schedule> Schedules { get; } = new List<Schedule>();
+        public long FlightLong { get; private set; }
 
         public Rout(DateTime date, FlightFrequency flightFrequency)
         {
@@ -25,7 +26,7 @@ namespace po_proj
 
         public void SetUpFlight()
         {
-            schedules.Add(new Schedule(FirstDeparturTime, CalculateArriveDateTime(FirstDeparturTime), this));
+            Schedules.Add(new Schedule(FirstDeparturTime, FirstDeparturTime.AddTicks(FlightLong), this));
         }
 
         public void SetUpFlight(DateTime date, Airport fromAirport, Airport toAirport, Plane plane, FlightFrequency flightFrequency)
@@ -35,19 +36,20 @@ namespace po_proj
             this.ToAirport = toAirport;
             this.Plane = plane;
             this.FlightFrequency = FlightFrequency;
+            this.FlightLong = CalculateTimeLong();
             SetUpFlight();
             Plane.Assign();
         }
 
         public bool IsSetUp()
         {
-            return schedules.Count != 0;
+            return Schedules.Count != 0;
         }
 
         public void ChangeDepartureTime(DateTime date)
         {
             long tics = date.Ticks - FirstDeparturTime.Ticks;
-            schedules.ForEach(s =>
+            Schedules.ForEach(s =>
             {
                 s.SetTime(s.Departuretime.AddTicks(tics), s.Arrivaltime.AddTicks(tics));
             });
@@ -82,7 +84,6 @@ namespace po_proj
             if (this.Plane != null) this.Plane.Unassign();
             plane.Assign();
             this.Plane = plane;
-
         }
 
         public bool IsOneFlight()
@@ -112,7 +113,7 @@ namespace po_proj
         {
             DateTime time = dateContext.Departuretime.AddTicks((long)FlightFrequency);
             Schedule schedule = FindSchedule(time);
-            if (schedule == null) schedule = new Schedule(time, CalculateArriveDateTime(time), this);
+            if (schedule == null) schedule = new Schedule(time, time.AddTicks(FlightLong), this);
             return schedule;
         }
         public Schedule PreviousSchedule(Schedule dateContext)
@@ -121,7 +122,7 @@ namespace po_proj
             if (time < DateTime.MinValue || time > DateTime.MaxValue) throw new DateIncorrectException("Data jest nieprawidłowa");
             if (time < FirstDeparturTime) throw new DateIncorrectException("Data wylotu wcześniejsza niż data pierwszego wylotu");
             Schedule schedule = FindSchedule(time);
-            if (schedule == null) schedule = new Schedule(time, CalculateArriveDateTime(time), this);
+            if (schedule == null) schedule = new Schedule(time, time.AddTicks(FlightLong), this);
             return schedule;
         }
 
@@ -130,7 +131,7 @@ namespace po_proj
             if (!WillFlight(date)) throw new Exception("Data not found");
 
             Schedule returningValue = null;
-            schedules.ForEach(schedule =>
+            Schedules.ForEach(schedule =>
            {
                if (schedule.Departuretime == date)
                {
@@ -144,21 +145,19 @@ namespace po_proj
 
         public void AddPassanger(Customer customer, Schedule schedule)
         {
-            if (!schedules.Contains(schedule)) schedules.Add(schedule);
-
+            if (!Schedules.Contains(schedule)) Schedules.Add(schedule);
 
             customer.SetFlightSchedule(schedule);
         }
 
-        public DateTime CalculateArriveDateTime(DateTime time)
+        public long CalculateTimeLong()
         {
-            return time.AddTicks((long)(TimeSpan.TicksPerHour * ((float)Plane.Speed / GetDistance())));
+            return (long)(TimeSpan.TicksPerHour * ((float)Plane.Speed / GetDistance()));
         }
-
 
         internal List<Schedule> GetSchedules()
         {
-            return schedules;
+            return Schedules;
         }
 
         public override string ToString()

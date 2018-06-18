@@ -16,11 +16,10 @@ using System.Windows.Shapes;
 
 namespace po_proj
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
+        private string FILE_NAME = "Dane";
+
         Central central = new Central();
 
         GroupBox selectedGroupBox = null;
@@ -29,58 +28,48 @@ namespace po_proj
         {
             InitializeComponent();
 
-            float expected = 5f;
-
-            Airport airport = new Airport();
-            airport.SetUp(2, 5, "1");
-            Airport airport2 = new Airport();
-            airport2.SetUp(5, 9, "2");
-            float actual = airport.GetDistance(airport2);
-
-
-
-            //DO USUNIECIA
+            //Ukryj wszystkie GroupBox'y
             routGroup.Visibility = Visibility.Hidden;
             customerGroup.Visibility = Visibility.Hidden;
             planeGroup.Visibility = Visibility.Hidden;
             airportGroup.Visibility = Visibility.Hidden;
 
-
-            central.AddCustomer(new Customer("Name", "Surname"));
-
             try
             {
-                if (File.Exists("file")) LoeadFromFile(ref central, "file");
+                if (File.Exists(FILE_NAME)) LoeadFromFile(ref central, FILE_NAME);
             }
             catch
             {
-                Console.WriteLine("Some errror");
+                Console.WriteLine("Błąd podczas wczytywania pliku");
             }
 
+            //Ustaw źródła TreeView
             customersTreeView.ItemsSource = central.Customers;
-            planeTreeView.ItemsSource = central.Planes;
-            airportTreeView.ItemsSource = central.Airports;
+            planesTreeView.ItemsSource = central.Planes;
+            airportsTreeView.ItemsSource = central.Airports;
             routsTreeView.ItemsSource = central.Routs;
 
-            airportFromBox.ItemsSource = central.Airports;
-            airportToBox.ItemsSource = central.Airports;
+            //Ustaw źródła ComboBox'ów
+            fromAirportBox.ItemsSource = central.Airports;
+            toAirportBox.ItemsSource = central.Airports;
             planeBox.ItemsSource = central.Planes;
             flighFreqBox.ItemsSource = Enum.GetValues(typeof(FlightFrequency));
-            customerFlighComboBox.ItemsSource = central.Routs;
+            customerFlighBox.ItemsSource = central.Routs;
 
-            //customersTreeView.MouseLeftButtonUp += CustomersItemClick; object sender, MouseButtonEventArgs e
-            airportTreeView.MouseLeftButtonUp += AiportItemClick;
-            planeTreeView.MouseLeftButtonUp += PlaneItemClick;
+            //Eventu ComboBox'ów
+            customerFlighBox.SelectionChanged += CustomerFlightChangedEvent;
+            schedulesComboBox.SelectionChanged += SchedulesChangeEvent;
+            toAirportBox.SelectionChanged += AirportSelectionBoxChanged;
+            fromAirportBox.SelectionChanged += AirportSelectionBoxChanged;
+
+            airportsTreeView.MouseLeftButtonUp += AiportItemClick;
+            planesTreeView.MouseLeftButtonUp += PlaneItemClick;
             routsTreeView.MouseLeftButtonUp += RoutsItemClick;
             customersTreeView.MouseLeftButtonUp += CustomersItemClick;
-            //object sender, RoutedPropertyChangedEventArgs<object> e
 
-            previousSchedule.Click += ShowPreviousFlightSchedule;
-            nextSchedule.Click += ShowNextFlightSchedule;
-
-
-            customerRatioButton.Checked += CustomButtomChecked;
-            customerRatioButton.Unchecked += CutomButtonUncheck;
+            //Ustaw zdarzenia Check/Uncheck przycisków "edytuj" 
+            customerRatioButton.Checked += CustomerButtonChecked;
+            customerRatioButton.Unchecked += CustomersButtonUnchecked;
             aiportCheckBox.Checked += AiportButtonChecked;
             aiportCheckBox.Unchecked += AiportButtonUncheck;
             planeCheckBox.Checked += PlaneButtonChecked;
@@ -89,12 +78,7 @@ namespace po_proj
             routsCheckBox.Unchecked += RoutsButtonUnchecked;
             generateRout.Unchecked += GenerateRoutButtonUnchecked;
             generateRout.Checked += GenerateRoutButtonChecked;
-
-            //Combobox eventy
-            customerFlighComboBox.SelectionChanged += CustomerFlightChangedEvent;
-            schedulesComboBox.SelectionChanged += SchedulesChangeEvent;
         }
-
 
 
         private void SchedulesChangeEvent(object sender, SelectionChangedEventArgs e)
@@ -105,36 +89,43 @@ namespace po_proj
             passengersTreeView.ItemsSource = schedule.GetPassengersList();
             flightArriveTime.Content = schedule.GetArrivalTimeAsString();
         }
+        private void AirportSelectionBoxChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Airport toAirport = (Airport)toAirportBox.SelectedItem;
+            Airport fromAirport = (Airport)fromAirportBox.SelectedItem;
+            if (toAirport == null || fromAirport == null)
+            {
+                distanceAirportsLabel.Content = "-";
+            }
+            else
+                distanceAirportsLabel.Content = toAirport.GetDistance(fromAirport);
+        }
 
         private void ShowNextFlightSchedule(object sender, RoutedEventArgs e)
         {
-            Rout rout = (Rout)customerFlighComboBox.SelectedItem;
-            if (rout == null) return;
-            //customerFlightSchedule.DataContext = rout.NextSchedule((Schedule)customerFlightSchedule.DataContext);
+            Rout rout = (Rout)customerFlighBox.SelectedItem;
+            if (rout == null || !rout.IsSetUp()) return;
             try
             {
-                Schedule schedule = rout.NextSchedule((Schedule)customerFlightSchedule.DataContext);
-                SetTextBoxDataContextAndText(customerFlightSchedule, schedule);
-                customerFlightArriveTime.Content = schedule.Arrivaltime;
-
+                Schedule schedule = rout.NextSchedule((Schedule)customerFlightScheduleLabel.DataContext);
+                SetTextBoxDataContextAndText(customerFlightScheduleLabel, schedule);
+                customerFlightArriveTime.Content = schedule.GetArrivalTimeAsString();
             }
             catch (FlightFrequencyException ex)
             {
                 PushError(ex.Message);
             }
-
         }
 
         private void ShowPreviousFlightSchedule(object sender, RoutedEventArgs e)
         {
-            Rout rout = (Rout)customerFlighComboBox.SelectedItem;
-            if (rout == null) return;
-            //customerFlightSchedule.DataContext = rout.PreviousSchedule((Schedule)customerFlightSchedule.DataContext);
+            Rout rout = (Rout)customerFlighBox.SelectedItem;
+            if (rout == null || !rout.IsSetUp()) return;
             try
             {
-                Schedule schedule = rout.PreviousSchedule((Schedule)customerFlightSchedule.DataContext);
-                SetTextBoxDataContextAndText(customerFlightSchedule, schedule);
-                customerFlightArriveTime.Content = schedule.Arrivaltime;
+                Schedule schedule = rout.PreviousSchedule((Schedule)customerFlightScheduleLabel.DataContext);
+                SetTextBoxDataContextAndText(customerFlightScheduleLabel, schedule);
+                customerFlightArriveTime.Content = schedule.GetArrivalTimeAsString();
             }
             catch (FlightFrequencyException ex)
             {
@@ -144,47 +135,58 @@ namespace po_proj
 
         private void CustomerFlightChangedEvent(object sender, SelectionChangedEventArgs e)
         {
-            Rout selectedRout = (Rout)((ComboBox)sender).SelectedItem;
-            if (selectedRout == null) return;
-            if (!selectedRout.IsSetUp())
+            Rout rout = (Rout)((ComboBox)sender).SelectedItem;
+            if (rout == null) return;
+            if (!rout.IsSetUp())
             {
-                customerFlightSchedule.Text = "";
+                customerFlightScheduleLabel.Text = "";
+                ((ComboBox)sender).SelectedItem = null;
+                PushError("Wybrany lot nie jest skonfigurowany!");
                 return;
             }
-            Schedule schedule = selectedRout.GetSchedules().ElementAt<Schedule>(0);
-            SetTextBoxDataContextAndText(customerFlightSchedule, schedule);
+            Schedule schedule = rout.GetSchedules().ElementAt<Schedule>(0);
+            SetTextBoxDataContextAndText(customerFlightScheduleLabel, schedule);
             customerFlightArriveTime.Content = schedule.GetArrivalTimeAsString();
         }
 
         private void SetTextBoxDataContextAndText(TextBox box, object obj)
         {
-            customerFlightSchedule.DataContext = obj;
-            customerFlightSchedule.Text = obj == null ? "" : obj.ToString();
+            customerFlightScheduleLabel.DataContext = obj;
+            customerFlightScheduleLabel.Text = obj == null ? "" : obj.ToString();
         }
 
-        private void RoutsItemClick(object sender, MouseButtonEventArgs e)
+        private void RoutsItemClick(object sender, object e)
         {
             Rout routs = (Rout)GetSelectedItem(routsTreeView);
             if (routs == null) return;
             ShowGroupBox(routGroup);
 
             flighFreqBox.SelectedItem = routs.FlightFrequency;
-            airportToBox.SelectedItem = routs.ToAirport;
-            airportFromBox.SelectedItem = routs.FromAirport;
+            toAirportBox.SelectedItem = routs.ToAirport;
+            fromAirportBox.SelectedItem = routs.FromAirport;
             planeBox.SelectedItem = routs.Plane;
             routDatePicker.SelectedDate = routs.FirstDeparturTime;
             schedulesComboBox.ItemsSource = routs.GetSchedules();
             routTimerLabel.Text = routs.FirstDeparturTime.ToString("HH:mm:ss");
+            passengersTreeView.ItemsSource = null;
+
             schedulesComboBox.SelectedItem = null;
             seatsAndSeatsLimitLabel.Content = "--/--";
             flightArriveTime.Content = "--";
-            if (routs.IsSetUp()) generateRout.IsEnabled = false;
-            else generateRout.IsEnabled = true;
+
+            if (routs.IsSetUp())
+            {
+                generateRout.IsEnabled = false;
+            }
+            else
+            {
+                generateRout.IsEnabled = true;
+            }
         }
 
-        private void PlaneItemClick(object sender, MouseButtonEventArgs e)
+        private void PlaneItemClick(object sender, object e)
         {
-            Plane plane = (Plane)GetSelectedItem(planeTreeView);
+            Plane plane = (Plane)GetSelectedItem(planesTreeView);
             if (plane == null) return;
             ShowGroupBox(planeGroup);
 
@@ -195,9 +197,9 @@ namespace po_proj
             isFree.Content = plane.IsFree ? "Wolny" : "Zajęty";
         }
 
-        private void AiportItemClick(object sender, MouseButtonEventArgs e)
+        private void AiportItemClick(object sender, object e)
         {
-            Airport airport = (Airport)GetSelectedItem(airportTreeView);
+            Airport airport = (Airport)GetSelectedItem(airportsTreeView);
             if (airport == null) return;
             ShowGroupBox(airportGroup);
 
@@ -206,7 +208,7 @@ namespace po_proj
             yLabel.Text = airport.Y.ToString();
         }
 
-        private void CustomersItemClick(object sender, MouseButtonEventArgs e)
+        private void CustomersItemClick(object sender, object e)
         {
             Customer customer = (Customer)GetSelectedItem(customersTreeView);
             if (customer == null) return;
@@ -215,8 +217,8 @@ namespace po_proj
             nameLabel.Text = customer.Name;
             surnameLabel.Text = customer.Surname;
             ticketPriceLabel.Text = customer.Ticket.Price.ToString();
-            customerFlighComboBox.SelectedItem = customer.GetFlight();
-            SetTextBoxDataContextAndText(customerFlightSchedule, customer.FlightSchedule);
+            customerFlighBox.SelectedItem = customer.GetFlight();
+            SetTextBoxDataContextAndText(customerFlightScheduleLabel, customer.FlightSchedule);
             ticketNumberLabel.Text =
                 customer.Ticket.IsSingle ? "1" : ((MultiTicket)customer.Ticket).GetNumberOfTicket().ToString();
             if (customer.FlightSchedule != null)
@@ -257,8 +259,8 @@ namespace po_proj
 
             if (!rout.IsSetUp())
             {
-                airportFromBox.IsEnabled = true;
-                airportToBox.IsEnabled = true;
+                fromAirportBox.IsEnabled = true;
+                toAirportBox.IsEnabled = true;
             }
 
             generateRout.IsEnabled = false;
@@ -270,8 +272,8 @@ namespace po_proj
 
         private void RoutsButtonUnchecked(object sender, RoutedEventArgs e)
         {
-            airportToBox.IsEnabled = false;
-            airportFromBox.IsEnabled = false;
+            toAirportBox.IsEnabled = false;
+            fromAirportBox.IsEnabled = false;
             planeBox.IsEnabled = false;
             flighFreqBox.IsEnabled = false;
             routDatePicker.IsEnabled = false;
@@ -280,39 +282,33 @@ namespace po_proj
 
             Rout rout = (Rout)GetSelectedItem(routsTreeView);
             Plane plane = (Plane)planeBox.SelectedItem;
-            Airport fromAirport = (Airport)airportFromBox.SelectedItem;
-            Airport toAirport = (Airport)airportToBox.SelectedItem;
+            Airport fromAirport = (Airport)fromAirportBox.SelectedItem;
+            Airport toAirport = (Airport)toAirportBox.SelectedItem;
             DateTime date = (DateTime)routDatePicker.SelectedDate;
 
             try
             {
+                float distance;
+                DateTime time;
+
                 if (!fromAirport.IsSetUp) throw new Exception("Lotnisko wylotowe nie jest skonfigurowane");
                 if (!toAirport.IsSetUp) throw new Exception("Lotnisko docelowe nie jest skonfigurowane");
                 if (!plane.IsSetUp) throw new Exception("Samolot nie jest skonfigurowany");
-                float distance;
-                if (IsInPlaneRange(plane, fromAirport, toAirport, out distance))
-                {
-                    rout.SetPlain(plane);
-                    rout.SetToAirport(toAirport);
-                    rout.SetFromAirport(fromAirport);
-                }
-                else throw new Exception("Samolot posiada za mały zasięg! Zasięg samolotu = " + plane.Range + " Odległość: " + distance);
-                DateTime time;
-                if (DateTime.TryParse(routTimerLabel.Text, out time))
-                {
-                    date = new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second);
-                    rout.ChangeDepartureTime(date);
-                    if (!rout.IsSetUp()) rout.SetUpFlight();
-                }
-                else throw new Exception("Podana data jest nieodpowiednia");
+                if (!IsInPlaneRange(plane, fromAirport, toAirport, out distance)) throw new Exception("Samolot posiada za mały zasięg! Zasięg samolotu = " + plane.Range + " Odległość: " + distance);
+                if (!DateTime.TryParse(routTimerLabel.Text, out time)) throw new Exception("Podana data jest nieodpowiednia");
 
+                date = new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second);
+
+                rout.SetPlain(plane);
+                rout.SetToAirport(toAirport);
+                rout.SetFromAirport(fromAirport);
+                rout.ChangeDepartureTime(date);
                 rout.SetFlightFrequency((FlightFrequency)flighFreqBox.SelectedItem);
-            }
-            catch (Exception ex)
-            {
-                PushError(ex.Message);
-            }
 
+                if (!rout.IsSetUp()) rout.SetUpFlight();
+            }
+            catch (NullReferenceException) { PushError("Ustaw poprawne wartości"); }
+            catch (Exception ex) { PushError(ex.Message); }
             RefreshTreeView();
         }
 
@@ -325,7 +321,7 @@ namespace po_proj
 
         private void PlaneButtonChecked(object sender, RoutedEventArgs e)
         {
-            Plane plane = (Plane)GetSelectedItem(planeTreeView);
+            Plane plane = (Plane)GetSelectedItem(planesTreeView);
             if (!plane.IsSetUp)
             {
                 rangeLabel.IsEnabled = true;
@@ -342,7 +338,7 @@ namespace po_proj
             speedLabel.IsEnabled = false;
             planeNameLabel.IsEnabled = false;
 
-            Plane plane = (Plane)GetSelectedItem(planeTreeView);
+            Plane plane = (Plane)GetSelectedItem(planesTreeView);
 
             try
             {
@@ -366,17 +362,15 @@ namespace po_proj
 
         private void AiportButtonUncheck(object sender, RoutedEventArgs e)
         {
-            Airport airport = (Airport)GetSelectedItem(airportTreeView);
+            Airport airport = (Airport)GetSelectedItem(airportsTreeView);
             try
             {
                 int X, Y;
                 string cityName;
                 if (cityLabel.Text.Length > 0) cityName = cityLabel.Text;
                 else throw new Exception("Nazwa miasta powinna być dłuższa niż 0 znaków");
-                if (Int32.TryParse(xLabel.Text, out X)) ;
-                else throw new Exception(("Zła pozycja Y"));
-                if (Int32.TryParse(yLabel.Text, out Y)) ;
-                else throw new Exception("Zła pozycja X");
+                if (!Int32.TryParse(xLabel.Text, out X)) throw new Exception("Zła pozycja Y");
+                if (!Int32.TryParse(yLabel.Text, out Y)) throw new Exception("Zła pozycja X");
 
                 airport.SetUp(X, Y, cityName);
 
@@ -394,7 +388,7 @@ namespace po_proj
 
         private void AiportButtonChecked(object sender, RoutedEventArgs e)
         {
-            Airport airport = (Airport)GetSelectedItem(airportTreeView);
+            Airport airport = (Airport)GetSelectedItem(airportsTreeView);
 
             if (!airport.IsSetUp)
             {
@@ -404,14 +398,14 @@ namespace po_proj
             }
         }
 
-        private void CutomButtonUncheck(object sender, RoutedEventArgs e)
+        private void CustomersButtonUnchecked(object sender, RoutedEventArgs e)
         {
             nameLabel.IsEnabled = false;
             surnameLabel.IsEnabled = false;
             ticketPriceLabel.IsEnabled = false;
             ticketNumberLabel.IsEnabled = false;
-            customerFlighComboBox.IsEnabled = false;
-            customerFlightSchedule.IsEnabled = false;
+            customerFlighBox.IsEnabled = false;
+            customerFlightScheduleLabel.IsEnabled = false;
             previousSchedule.IsEnabled = false;
             nextSchedule.IsEnabled = false;
 
@@ -433,7 +427,7 @@ namespace po_proj
                         customer.SetTicket(customer.Ticket.Change(price, tickets));
                 }
                 else throw new Exception("Zła liczba biletów");
-                schedule = (Schedule)customerFlightSchedule.DataContext;
+                schedule = (Schedule)customerFlightScheduleLabel.DataContext;
                 if (schedule != null) schedule.Rout.AddPassanger(customer, schedule);
             }
             catch (Exception ex)
@@ -444,13 +438,13 @@ namespace po_proj
             RefreshTreeView();
         }
 
-        private void CustomButtomChecked(object sender, RoutedEventArgs e)
+        private void CustomerButtonChecked(object sender, RoutedEventArgs e)
         {
             nameLabel.IsEnabled = true;
             surnameLabel.IsEnabled = true;
             ticketPriceLabel.IsEnabled = true;
             ticketNumberLabel.IsEnabled = true;
-            customerFlighComboBox.IsEnabled = true;
+            customerFlighBox.IsEnabled = true;
             previousSchedule.IsEnabled = true;
             nextSchedule.IsEnabled = true;
         }
@@ -458,16 +452,16 @@ namespace po_proj
         private void GenerateRoutButtonUnchecked(object sender, RoutedEventArgs e)
         {
             routsCheckBox.IsEnabled = true;
-            airportFromBox.IsEnabled = false;
-            airportToBox.IsEnabled = false;
+            fromAirportBox.IsEnabled = false;
+            toAirportBox.IsEnabled = false;
             flighFreqBox.IsEnabled = false;
             seatsLimitLabel.IsEnabled = false;
             routDatePicker.IsEnabled = false;
             routTimerLabel.IsEnabled = false;
 
             Rout rout = (Rout)GetSelectedItem(routsTreeView);
-            Airport fromAirport = (Airport)airportFromBox.SelectedItem;
-            Airport toAirport = (Airport)airportToBox.SelectedItem;
+            Airport fromAirport = (Airport)fromAirportBox.SelectedItem;
+            Airport toAirport = (Airport)toAirportBox.SelectedItem;
             DateTime date = (DateTime)routDatePicker.SelectedDate;
 
             int numberOfSeats;
@@ -486,18 +480,16 @@ namespace po_proj
                 generateRout.IsEnabled = false;
                 RoutsItemClick(sender, null);
             }
-            catch (Exception ex)
-            {
-                PushError(ex.Message);
-            }
+            catch (NullReferenceException) { PushError("Ustaw poprawne wartości"); }
+            catch (Exception ex) { PushError(ex.Message); }
             RefreshTreeView();
         }
 
         private void GenerateRoutButtonChecked(object sender, RoutedEventArgs e)
         {
             routsCheckBox.IsEnabled = false;
-            airportFromBox.IsEnabled = true;
-            airportToBox.IsEnabled = true;
+            fromAirportBox.IsEnabled = true;
+            toAirportBox.IsEnabled = true;
             flighFreqBox.IsEnabled = true;
             seatsLimitLabel.IsEnabled = true;
             routDatePicker.IsEnabled = true;
@@ -507,13 +499,6 @@ namespace po_proj
         private object GetSelectedItem(TreeView view)
         {
             return view.SelectedItem;
-        }
-
-        private String GetTextBoxText(Object sender)
-        {
-            TextBox box = (TextBox)sender;
-            if (box.Text.Length == 0) return null;
-            return box.Text;
         }
 
         public void AddCustomerButtonClick(object sender, RoutedEventArgs e)
@@ -559,7 +544,7 @@ namespace po_proj
         {
             try
             {
-                central.RemoveAiport((Airport)GetSelectedItem(airportTreeView));
+                central.RemoveAiport((Airport)GetSelectedItem(airportsTreeView));
                 RefreshTreeView();
             }
             catch (Exception ex)
@@ -572,7 +557,7 @@ namespace po_proj
         {
             try
             {
-                central.RemovePlain((Plane)GetSelectedItem(planeTreeView));
+                central.RemovePlain((Plane)GetSelectedItem(planesTreeView));
                 RefreshTreeView();
             }
             catch (Exception ex)
@@ -597,7 +582,7 @@ namespace po_proj
 
         private void ClosingWindowEvent(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            SaveToFile("file", central);
+            SaveToFile(FILE_NAME, central);
         }
 
         public void WindowMouseButton(object sender, MouseButtonEventArgs e)
@@ -605,12 +590,14 @@ namespace po_proj
             RemoveError();
         }
 
+        //Wyświetl błąd na dole okna
         public void PushError(String text)
         {
             errorLabel.Foreground = Brushes.Red;
             errorLabel.Content = text;
         }
 
+        //Usuń błąd na dole okna
         public void RemoveError()
         {
             errorLabel.Foreground = Brushes.Black;
@@ -619,13 +606,37 @@ namespace po_proj
 
         public void RefreshTreeView()
         {
+            RefreshView(routsTreeView);
+            RefreshView(customersTreeView);
+            RefreshView(planesTreeView);
+            RefreshView(airportsTreeView);
+            RefreshView(passengersTreeView);
+            RefreshView(customerFlighBox);
+            RefreshView(schedulesComboBox);
+            /*
+
             routsTreeView.Items.Refresh();
             customersTreeView.Items.Refresh();
-            planeTreeView.Items.Refresh();
-            airportTreeView.Items.Refresh();
-            customerFlighComboBox.Items.Refresh();
+            planesTreeView.Items.Refresh();
+            airportsTreeView.Items.Refresh();
             passengersTreeView.Items.Refresh();
             schedulesComboBox.Items.Refresh();
+            customerFlighBox.Items.Refresh();
+            */
+        }
+
+        private void RefreshView(ComboBox view)
+        {
+            view.Items.Refresh();
+        }
+
+        public void RefreshView(TreeView view)
+        {
+            object obj = view.SelectedItem;
+            view.Items.Refresh();
+            TreeViewItem obj2 = (TreeViewItem)view.ItemContainerGenerator.ContainerFromItem(obj);
+            if (obj2 != null) obj2.IsSelected = true;
+
         }
     }
 }

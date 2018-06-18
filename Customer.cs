@@ -14,7 +14,6 @@ namespace po_proj
         public String Surname { get; set; }
         public Schedule FlightSchedule { get; private set; }
 
-
         public Customer(String name, String surname)
         {
             SetTicket(new Ticket(0));

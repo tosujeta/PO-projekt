@@ -9,7 +9,7 @@
         MouseLeftButtonUp="WindowMouseButton"
         Title="Samoloty" Height="480.334" Width="800">
     <Grid>
-        <GroupBox Name ="customerGroup" Visibility="Visible" Header="" HorizontalAlignment="Left" Height="147" Margin="10,262,0,0" VerticalAlignment="Top" Width="772">
+        <GroupBox Name ="customerGroup" Visibility="Hidden" Header="" HorizontalAlignment="Left" Height="147" Margin="10,262,0,0" VerticalAlignment="Top" Width="772">
             <Grid HorizontalAlignment="Left" Height="128" VerticalAlignment="Top" Width="772" RenderTransformOrigin="1.02,0.09" Margin="0,0,0,0">
                 <Label Content="Imię:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                 <Label Content="Nazwisko:" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
@@ -21,11 +21,11 @@
                 <TextBox Name="ticketNumberLabel" IsEnabled="false" HorizontalAlignment="Left" Margin="327,49,0,0" Text="" VerticalAlignment="Top" Width="120"/>
                 <CheckBox Name="customerRatioButton" Content="Edytuj" HorizontalAlignment="Left" Margin="705,103,0,0" VerticalAlignment="Top"/>
                 <Label Content="Lot:" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top" Width="63"/>
-                <ComboBox Name="customerFlighComboBox" IsEnabled="False" HorizontalAlignment="Left" Margin="73,76,0,0" VerticalAlignment="Top" Width="100"/>
-                <TextBox Name="customerFlightSchedule" IsEnabled="False" HorizontalAlignment="Left" Margin="344,76,0,0" VerticalAlignment="Top" Width="160" Height="Auto"/>
+                <ComboBox Name="customerFlighBox" IsEnabled="False" HorizontalAlignment="Left" Margin="73,76,0,0" VerticalAlignment="Top" Width="100"/>
+                <TextBox Name="customerFlightScheduleLabel" IsEnabled="False" HorizontalAlignment="Left" Margin="344,76,0,0" VerticalAlignment="Top" Width="160" Height="Auto"/>
                 <Label Content="Harmonogram:" HorizontalAlignment="Left" Margin="221,72,0,0" VerticalAlignment="Top"/>
-                <Button Name="previousSchedule" Content="&lt;" IsEnabled="False" HorizontalAlignment="Left" Margin="317,76,0,0" VerticalAlignment="Top" Width="22" Height="22"/>
-                <Button Name="nextSchedule" Content=">" IsEnabled="False" HorizontalAlignment="Left" Margin="509,76,0,0" VerticalAlignment="Top" Width="22" Height="22"/>
+                <Button Name="previousSchedule" Click="ShowPreviousFlightSchedule" Content="&lt;" IsEnabled="False" HorizontalAlignment="Left" Margin="317,76,0,0" VerticalAlignment="Top" Width="22" Height="22"/>
+                <Button Name="nextSchedule" Click="ShowNextFlightSchedule" Content=">" IsEnabled="False" HorizontalAlignment="Left" Margin="509,76,0,0" VerticalAlignment="Top" Width="22" Height="22"/>
                 <Button Name="removeCustomerButton" Click="RemoveCustomerClick" Content="Usuń" HorizontalAlignment="Left" Margin="685,78,0,0" VerticalAlignment="Top" Width="75"/>
                 <Label Content="Przylot:" HorizontalAlignment="Left" Margin="221,97,0,0" VerticalAlignment="Top" Width="87"/>
                 <Label Name="customerFlightArriveTime" Content="" HorizontalAlignment="Left" Margin="344,99,0,0" VerticalAlignment="Top" Width="160"/>
@@ -65,38 +65,40 @@
             </Grid>
         </GroupBox>
 
-        <GroupBox Name ="routGroup" Visibility="Hidden" Header="" HorizontalAlignment="Left" Height="147" Margin="10,262,0,0" VerticalAlignment="Top" Width="772">
+        <GroupBox Name ="routGroup" Visibility="Visible" Header="" HorizontalAlignment="Left" Height="147" Margin="10,262,0,0" VerticalAlignment="Top" Width="772">
             <Grid HorizontalAlignment="Left" Height="128" VerticalAlignment="Top" Width="772" RenderTransformOrigin="1.02,0.09" Margin="0,0,0,0">
                 <Label Content="Lotnisko wylotowe:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                 <Label Content="Lotnisko docelowe:" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
                 <Label Content="Samolot:" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top"/>
                 <Label Content="Częstotliwość lotu:" HorizontalAlignment="Left" Margin="11,98,0,0" VerticalAlignment="Top"/>
                 <ComboBox Name="flighFreqBox" IsEnabled="False" HorizontalAlignment="Left" Margin="124,99,0,0" VerticalAlignment="Top" Width="120"/>
-                <ComboBox Name="airportFromBox" IsEnabled="False" HorizontalAlignment="Left" Margin="124,14,0,0" VerticalAlignment="Top" Width="120"/>
-                <ComboBox Name="airportToBox" IsEnabled="False" HorizontalAlignment="Left" Margin="124,45,0,0" VerticalAlignment="Top" Width="120"/>
+                <ComboBox Name="fromAirportBox" IsEnabled="False" HorizontalAlignment="Left" Margin="124,14,0,0" VerticalAlignment="Top" Width="120"/>
+                <ComboBox Name="toAirportBox" IsEnabled="False" HorizontalAlignment="Left" Margin="124,45,0,0" VerticalAlignment="Top" Width="120"/>
                 <ComboBox Name="planeBox" IsEnabled="False" HorizontalAlignment="Left" Margin="124,72,0,0" VerticalAlignment="Top" Width="120"/>
-                <TreeView Name="passengersTreeView" HorizontalAlignment="Left" Height="80" Margin="277,41,0,0" VerticalAlignment="Top" Width="118"/>
+                <TreeView Name="passengersTreeView" HorizontalAlignment="Left" Height="57" Margin="253,41,0,0" VerticalAlignment="Top" Width="142"/>
                 <CheckBox Name="routsCheckBox" Content="Edytuj" HorizontalAlignment="Left" Margin="687,103,0,0" VerticalAlignment="Top" Width="65"/>
                 <Label Content="Pierwszy wylot:" HorizontalAlignment="Left" Margin="400,10,0,0" VerticalAlignment="Top"/>
                 <DatePicker Name="routDatePicker" IsEnabled="False" HorizontalAlignment="Left" Margin="494,11,0,0" VerticalAlignment="Top"/>
                 <TextBox Name="routTimerLabel" IsEnabled="False" HorizontalAlignment="Left" Height="23" Margin="601,11,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-                <ComboBox Name="schedulesComboBox" HorizontalAlignment="Left" Margin="277,10,0,0" VerticalAlignment="Top" Width="118"/>
+                <ComboBox Name="schedulesComboBox" HorizontalAlignment="Left" Margin="253,10,0,0" VerticalAlignment="Top" Width="142"/>
                 <Label Content="Zajęte miejsca:" HorizontalAlignment="Left" Margin="400,68,0,0" VerticalAlignment="Top" Width="89"/>
-                <Label Name="seatsAndSeatsLimitLabel" Content="" HorizontalAlignment="Left" Margin="494,68,0,0" VerticalAlignment="Top" Width="102"/>
+                <Label Name="seatsAndSeatsLimitLabel" Content="" HorizontalAlignment="Left" Margin="494,68,0,0" VerticalAlignment="Top" Width="84"/>
                 <Button Name="removeRoutButton" Click="RemoveRoutClick" Content="Usuń" HorizontalAlignment="Left" Margin="685,78,0,0" VerticalAlignment="Top" Width="75"/>
                 <CheckBox Name="generateRout" Content="Generuj" HorizontalAlignment="Left" Margin="611,104,0,0" VerticalAlignment="Top"/>
                 <Label Content="Liczba miejsc:" HorizontalAlignment="Left" Margin="400,95,0,0" VerticalAlignment="Top" Width="89"/>
                 <TextBox Name="seatsLimitLabel" HorizontalAlignment="Left" IsEnabled="False" Height="23" Margin="494,98,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="84"/>
                 <Label Content="Przylot:" HorizontalAlignment="Left" Margin="400,41,0,0" VerticalAlignment="Top" Width="89"/>
                 <Label Name="flightArriveTime" Content="" HorizontalAlignment="Left" Margin="494,41,0,0" VerticalAlignment="Top" Width="227"/>
+                <Label Content="Odległość:" HorizontalAlignment="Left" Margin="253,97,0,0" VerticalAlignment="Top"/>
+                <Label Name="distanceAirportsLabel" Content="Label" HorizontalAlignment="Left" Margin="324,99,0,0" VerticalAlignment="Top" Width="71"/>
             </Grid>
         </GroupBox>
         <Button Name="addCustomerButton" Click="AddCustomerButtonClick" Content="Dodaj pasażera" HorizontalAlignment="Left" Margin="10,237,0,0" VerticalAlignment="Top" Width="184"/>
         <Button Name="addAirportButton" Click="AddAirportButtonClick" Content="Dodaj Lotnisko" HorizontalAlignment="Left" Margin="199,237,0,0" VerticalAlignment="Top" Width="184"/>
         <Button Name="addPlaneButton" Click="AddPlaneButtonClick" Content="Dodaj samolot" HorizontalAlignment="Left" Margin="388,237,0,0" VerticalAlignment="Top" Width="184"/>
         <Button Name="addRoutButton" Click="AddRoutButtonClick" Content="Dodaj trasę" HorizontalAlignment="Left" Margin="577,237,0,0" VerticalAlignment="Top" Width="184"/>
-        <TreeView Name="airportTreeView" HorizontalAlignment="Left" Height="222" Margin="199,10,0,0" VerticalAlignment="Top" Width="184"/>
-        <TreeView Name="planeTreeView" HorizontalAlignment="Left" Height="222" Margin="388,10,0,0" VerticalAlignment="Top" Width="184"/>
+        <TreeView Name="airportsTreeView" HorizontalAlignment="Left" Height="222" Margin="199,10,0,0" VerticalAlignment="Top" Width="184"/>
+        <TreeView Name="planesTreeView" HorizontalAlignment="Left" Height="222" Margin="388,10,0,0" VerticalAlignment="Top" Width="184"/>
         <TreeView Name="routsTreeView" HorizontalAlignment="Left" Height="222" Margin="577,10,0,0" VerticalAlignment="Top" Width="184"/>
         <TreeView Name="customersTreeView"  HorizontalAlignment="Left" Height="222" Margin="10,10,0,0" VerticalAlignment="Top" Width="184"/>
         <DockPanel HorizontalAlignment="Left" Height="30" LastChildFill="False" Margin="10,414,0,0" VerticalAlignment="Top" Width="772">
